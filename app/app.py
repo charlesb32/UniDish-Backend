@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from flask_jwt_extended import JWTManager, create_access_token
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS  # Import CORS
 import mysql.connector
@@ -112,6 +112,12 @@ def login():
     cursor.close()
     db.close()
     return jsonify({'message': 'Wrong Password'}), 400
+
+@app.route('/getUserByToken', methods=['GET'])
+@jwt_required()
+def get_user():
+    current_user = get_jwt_identity()
+    return jsonify(isLoggedIn=True, user=current_user)
 
 if __name__ == '__main__':
     app.run(debug=True)
