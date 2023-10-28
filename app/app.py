@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+from flask_jwt_extended import JWTManager, create_access_token
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS  # Import CORS
 import mysql.connector
@@ -6,6 +7,8 @@ import mysql.connector
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 bcrypt = Bcrypt(app)
+app.config['JWT_SECRET_KEY'] = 'your-secret-key'
+jwt = JWTManager(app)
 db_config = {
     "host": "127.0.0.1",
     "user": "charlesb32",
@@ -74,5 +77,41 @@ def add_user():
         cursor.close()
         db.close()
         return jsonify({'message': str(e)}), 500
+
+@app.route('/login', methods=['POST'])
+def login():
+    user_logging_in = request.json['loginPayload']
+    email = user_logging_in['email']
+    password = user_logging_in['password']
+
+    db = mysql.connector.connect(**db_config)
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
+    db_user = cursor.fetchone()
+    
+    if not db_user:
+        return jsonify({'message': 'No account with this email'}), 401
+    print(email, password)
+
+    if bcrypt.check_password_hash(db_user['password'], password):
+        payload = {
+            'email': db_user['email'],
+            'id': db_user['user_id'],
+            'firstname': db_user['firstname'],
+            'lastname': db_user['lastname'],
+            'username': db_user['username'],
+            'type': db_user['type'],
+            'profile_description': db_user['profile_description']
+        }
+        token = create_access_token(identity=payload, expires_delta=False)
+         # Close the cursor and connection
+        cursor.close()
+        db.close()
+        return jsonify({'message': 'Success', 'token': 'Bearer ' + token}), 200
+     # Close the cursor and connection
+    cursor.close()
+    db.close()
+    return jsonify({'message': 'Wrong Password'}), 400
+
 if __name__ == '__main__':
     app.run(debug=True)
