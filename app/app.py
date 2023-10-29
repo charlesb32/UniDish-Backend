@@ -3,12 +3,14 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS  # Import CORS
 import mysql.connector
+from flask_jwt_extended.exceptions import JWTExtendedException
+import jwt
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 bcrypt = Bcrypt(app)
-app.config['JWT_SECRET_KEY'] = 'your-secret-key'
-jwt = JWTManager(app)
+app.config['JWT_SECRET_KEY'] = 'SECRET_KEY'
+jwt_manager = JWTManager(app)
 db_config = {
     "host": "127.0.0.1",
     "user": "charlesb32",
@@ -114,10 +116,28 @@ def login():
     return jsonify({'message': 'Wrong Password'}), 400
 
 @app.route('/getUserByToken', methods=['GET'])
-@jwt_required()
-def get_user():
-    current_user = get_jwt_identity()
-    return jsonify(isLoggedIn=True, user=current_user)
+def get_user_y_token():
+    auth_header = request.headers.get('Authorization', None)
+    print('Authheader: ', auth_header)
+    if not auth_header:
+        return jsonify(message="Missing Authorization Header"), 401
+
+    try:
+        # The header format is "Bearer TOKEN", so split by space and get the token
+        token = auth_header.split(" ")[1]
+        decoded_token = jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=["HS256"])
+        return jsonify(isLoggedIn=True, user=decoded_token), 200
+    except jwt.ExpiredSignatureError:
+        return jsonify(message="Token has expired"), 401
+    except jwt.InvalidTokenError:
+        return jsonify(message="Invalid token"), 401
+    except Exception as e:
+        return jsonify(message=str(e)), 500
+
+@app.errorhandler(JWTExtendedException)
+def handle_jwt_extended_error(err):
+    print("JWT Error:", str(err))
+    return jsonify(message="JWT Error: " + str(err)), 422
 
 if __name__ == '__main__':
     app.run(debug=True)
