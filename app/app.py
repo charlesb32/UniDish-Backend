@@ -125,7 +125,7 @@ def login():
     cursor = db.cursor(dictionary=True)
     cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
     db_user = cursor.fetchone()
-    
+    print('LOGIN DB USER: ', db_user)
     if not db_user:
         return jsonify({'message': 'No account with this email'}), 401
     print(email, password)
@@ -203,5 +203,60 @@ def get_menu_items_for_restaurant():
         cursor.close()
         db.close()
         return jsonify({'message': str(e)}), 500
+
+@app.route('/updateUserInfo', methods=['PUT'])
+def update_user_info():
+    db = mysql.connector.connect(**db_config)
+    cursor = db.cursor()
+    user_info = request.json['userInfo']
+    print('USERINFO', user_info)
+    try:
+        cursor.execute("UPDATE USERS SET profile_description = %s WHERE email = %s", (user_info['profile_description'], user_info['email']) )
+        db.commit()
+        cursor.close()
+        db.close()
+        return jsonify({"message": "User updated successfully"}), 200
+    except Exception as e:
+        cursor.close()
+        db.close()
+        return jsonify({'message': str(e)}), 500
+
+@app.route('/updatePassword', methods=['PUT'])
+def update_password():
+    db = mysql.connector.connect(**db_config)
+    cursor = db.cursor()
+    password = request.json['passwordPayload']
+    user_id = request.json['userId']
+    try:
+        cursor = db.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM users WHERE user_id=%s", (user_id,))
+        db_user = cursor.fetchone()
+        print('DB_USER: ', db_user)
+        if bcrypt.check_password_hash(db_user['password'], password['oldPassword']):
+            print('HERE')
+            if password['newPassword'] == password['confirmNewPassword']:
+                #update password to new pass
+                hashed_password = bcrypt.generate_password_hash(password['newPassword']).decode('utf-8')
+                cursor.execute("UPDATE USERS SET password = %s WHERE user_id = %s", (hashed_password, user_id) )
+                db.commit()
+                cursor.close()
+                db.close()
+                return jsonify({"message": "User Password updated successfully"}), 200
+            else:
+                cursor.close()
+                db.close()
+                return jsonify({'message': 'New Password Do not Match'}), 400
+                #new passwords no not match
+        else:
+            print('HERE2')
+            #old password incorrect
+            cursor.close()
+            db.close()
+            return jsonify({'message': 'Old Password is Incorrect'}), 400
+    except Exception as e:
+        cursor.close()
+        db.close()
+        return jsonify({'message': str(e)}), 500
+    print('PASSWORD PAYLOAFD: ', password_info, user_id)
 if __name__ == '__main__':
     app.run(debug=True)
