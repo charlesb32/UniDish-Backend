@@ -120,7 +120,8 @@ def login():
     user_logging_in = request.json['loginPayload']
     email = user_logging_in['email']
     password = user_logging_in['password']
-
+    hash = bcrypt.generate_password_hash(password).decode('utf-8')
+    print('HASH', hash)
     db = mysql.connector.connect(**db_config)
     cursor = db.cursor(dictionary=True)
     cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
@@ -258,5 +259,22 @@ def update_password():
         db.close()
         return jsonify({'message': str(e)}), 500
     print('PASSWORD PAYLOAFD: ', password_info, user_id)
+
+@app.route('/addRestaurant', methods=['POST'])
+def add_restaurant():
+    rest_data = request.json['restData']
+    db = mysql.connector.connect(**db_config)
+    cursor = db.cursor()
+    print(rest_data)
+    try:
+        cursor.execute('INSERT INTO RESTAURANTS (name, description, dining_hall_id) VALUES (%s, %s, %s)', (rest_data['name'], rest_data['description'], rest_data['diningHallId']))
+        db.commit()
+        cursor.close()
+        db.close()
+        return jsonify({"message": "Restaurant Added successfully"}), 200
+    except Exception as e:
+        cursor.close()
+        db.close()
+        return jsonify({'message': str(e)}), 500
 if __name__ == '__main__':
     app.run(debug=True)
