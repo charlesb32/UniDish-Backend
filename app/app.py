@@ -276,5 +276,38 @@ def add_restaurant():
         cursor.close()
         db.close()
         return jsonify({'message': str(e)}), 500
+
+@app.route('/deleteRestaurant/<int:rest_id>', methods=['DELETE'])
+def delete_restaurant(rest_id):
+    print('REST_ID: ', rest_id)
+    db = mysql.connector.connect(**db_config)
+    cursor = db.cursor()
+    try:
+        cursor.execute("DELETE FROM RESTAURANTS WHERE restaurant_id = %s", (rest_id,))
+        db.commit()
+        cursor.close()
+        db.close()
+        return jsonify({"message": "Restaurant Deleted successfully"}), 200
+    except Exception as e:
+        cursor.close()
+        db.close()  
+        return jsonify({'message': str(e)}), 500
+
+@app.route('/editRestaurant', methods=['PUT'])
+def edit_restaurant():
+    rest = request.json['restData']
+    db = mysql.connector.connect(**db_config)
+    cursor = db.cursor()
+    print(rest)
+    try:
+        cursor.execute("UPDATE RESTAURANTS SET name = %s, description = %s WHERE restaurant_id=%s", (rest['name'], rest['description'], rest['diningHallId']))
+        db.commit()
+        cursor.close()
+        db.close()
+        return jsonify({"message": "Restaurant Updated successfully"}), 200
+    except Exception as e:
+        cursor.close()
+        db.close()  
+        return jsonify({'message': str(e)}), 500
 if __name__ == '__main__':
     app.run(debug=True)
