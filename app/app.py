@@ -304,7 +304,23 @@ def delete_restaurant(rest_id):
         db.commit()
         cursor.close()
         db.close()
-        return jsonify({"message": "Restaurant Deleted successfully"}), 200
+        return jsonify({"message": "Restaurant deleted successfully"}), 200
+    except Exception as e:
+        cursor.close()
+        db.close()  
+        return jsonify({'message': str(e)}), 500
+
+@app.route('/deleteDiningHall/<int:dining_hall_id>', methods=['DELETE'])
+def delete_dining_hall(dining_hall_id):
+    print('DINING_HALL_ID: ', dining_hall_id)
+    db = mysql.connector.connect(**db_config)
+    cursor = db.cursor()
+    try:
+        cursor.execute("DELETE FROM DINING_HALLS WHERE dining_hall_id = %s", (dining_hall_id,))
+        db.commit()
+        cursor.close()
+        db.close()
+        return jsonify({"message": "Dining hall deleted successfully"}), 200
     except Exception as e:
         cursor.close()
         db.close()  
@@ -322,6 +338,23 @@ def edit_restaurant():
         cursor.close()
         db.close()
         return jsonify({"message": "Restaurant Updated successfully"}), 200
+    except Exception as e:
+        cursor.close()
+        db.close()  
+        return jsonify({'message': str(e)}), 500
+
+@app.route('/editDiningHall', methods=['PUT'])
+def edit_dining_hall():
+    dining_hall = request.json['diningHallData']
+    db = mysql.connector.connect(**db_config)
+    cursor = db.cursor()
+    print(dining_hall)
+    try:
+        cursor.execute("UPDATE DINING_HALLS SET dining_hall_name = %s, description = %s, dining_hall_address = %s WHERE dining_hall_id=%s", (dining_hall['name'], dining_hall['description'], dining_hall['address'], dining_hall['id']))
+        db.commit()
+        cursor.close()
+        db.close()
+        return jsonify({"message": "Dining Hall Updated successfully"}), 200
     except Exception as e:
         cursor.close()
         db.close()  
