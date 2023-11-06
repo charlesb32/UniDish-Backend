@@ -359,5 +359,39 @@ def edit_dining_hall():
         cursor.close()
         db.close()  
         return jsonify({'message': str(e)}), 500
+
+@app.route('/editMenuItem', methods=['PUT'])
+def edit_menu_item():
+    menu_item = request.json['menuItem']
+    db = mysql.connector.connect(**db_config)
+    cursor = db.cursor()
+    print(menu_item)
+    try:
+        cursor.execute("UPDATE MENU_ITEMS SET name = %s, description = %s, calorie_count = %s, price = %s WHERE menu_item_id= %s", (menu_item['name'], menu_item['description'], menu_item['calories'],  menu_item['price'], menu_item['id']))
+        db.commit()
+        cursor.close()
+        db.close()
+        return jsonify({"message": "Menu Item Updated successfully"}), 200
+    except Exception as e:
+        cursor.close()
+        db.close()  
+        return jsonify({'message': str(e)}), 500
+
+@app.route('/addMenuItem' , methods=['POST'])
+def add_menu_item():
+    menu_item = request.json['menuItem']
+    db = mysql.connector.connect(**db_config)
+    cursor = db.cursor()
+    print(menu_item)
+    try:
+        cursor.execute('INSERT INTO MENU_ITEMS (name, description, calorie_count, price, restaurant_id) VALUES (%s, %s, %s, %s, %s)', (menu_item['name'], menu_item['description'], menu_item['calories'], menu_item['price'], menu_item['restaurantId']))
+        db.commit()
+        cursor.close()
+        db.close()
+        return jsonify({"message": "Restaurant Added successfully"}), 200
+    except Exception as e:
+        cursor.close()
+        db.close()
+        return jsonify({'message': str(e)}), 500
 if __name__ == '__main__':
     app.run(debug=True)
