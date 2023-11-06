@@ -260,6 +260,23 @@ def update_password():
         return jsonify({'message': str(e)}), 500
     print('PASSWORD PAYLOAFD: ', password_info, user_id)
 
+@app.route('/addDiningHall', methods=['POST'])
+def add_dining_hall():
+    dining_hall_data = request.json['diningHallData']
+    db = mysql.connector.connect(**db_config)
+    cursor = db.cursor()
+    print(dining_hall_data)
+    try:
+        cursor.execute('INSERT INTO DINING_HALLS (dining_hall_name, description, dining_hall_address) VALUES (%s, %s, %s)', (dining_hall_data['name'], dining_hall_data['description'], dining_hall_data['address']))
+        db.commit()
+        cursor.close()
+        db.close()
+        return jsonify({"message": "Dining Hall Added successfully"}), 200
+    except Exception as e:
+        cursor.close()
+        db.close()
+        return jsonify({'message': str(e)}), 500
+
 @app.route('/addRestaurant', methods=['POST'])
 def add_restaurant():
     rest_data = request.json['restData']
