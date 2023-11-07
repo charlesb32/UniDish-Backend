@@ -377,6 +377,22 @@ def edit_menu_item():
         db.close()  
         return jsonify({'message': str(e)}), 500
 
+@app.route('/deleteMenuItem/<int:menu_item_id>', methods=['DELETE'])
+def delete_menu_item(menu_item_id):
+    print('MENU_ITEM_ID: ', menu_item_id)
+    db = mysql.connector.connect(**db_config)
+    cursor = db.cursor()
+    try:
+        cursor.execute("DELETE FROM MENU_ITEMS WHERE menu_item_id = %s", (menu_item_id,))
+        db.commit()
+        cursor.close()
+        db.close()
+        return jsonify({"message": "Menu item deleted successfully"}), 200
+    except Exception as e:
+        cursor.close()
+        db.close()  
+        return jsonify({'message': str(e)}), 500
+
 @app.route('/addMenuItem' , methods=['POST'])
 def add_menu_item():
     menu_item = request.json['menuItem']
