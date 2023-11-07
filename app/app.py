@@ -82,8 +82,9 @@ def get_dining_halls_with_restaurants():
 def add_user():
     user_data = request.json['userData']
     print(user_data)
-    if user_data['password'] != user_data['confirmPassword']:
-        return jsonify({'message' : 'Passwords do not match'}) , 400
+    if 'confirmPassword' in user_data:
+        if user_data['password'] != user_data['confirmPassword']:
+            return jsonify({'message' : 'Passwords do not match'}) , 400
     db = mysql.connector.connect(**db_config)
     cursor = db.cursor()
     try:
@@ -102,7 +103,7 @@ def add_user():
         INSERT INTO users (username, email, password, type, profile_description, firstname, lastname)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
-        cursor.execute(insert_query, (user_data['username'], user_data['email'], hashed_password, 'user', '', user_data['firstname'], user_data['lastname']))
+        cursor.execute(insert_query, (user_data['username'], user_data['email'], hashed_password, user_data['type'], '', user_data['firstname'], user_data['lastname']))
         # Commit the changes to the database
         db.commit()
 
