@@ -666,5 +666,29 @@ def get_overall_restaurant_rating():
         cursor.close()
         db.close()
 
+
+@app.route('/createReview', methods=['POST'])
+def create_review():
+    db = mysql.connector.connect(**db_config)
+    cursor = db.cursor(dictionary=True)
+    review_info = request.json['reviewInfo']
+    rating = review_info['rating']
+    description = review_info['description']
+    user_id = review_info['userId']
+    rest_id = review_info['restaurantId']
+    date = review_info['date']
+    try:
+        cursor.execute("""
+        INSERT INTO reviews (date, rating, description, restaurant_id, user_id)
+        VALUES (%s, %s, %s, %s, %s)
+        """, (date, rating, description, rest_id, user_id))
+        db.commit()
+        return jsonify({'message': 'Review added successfully'}), 200
+    except Exception as e:
+        print(f"Error in create_review: {e}")
+        return jsonify({'message': str(e)}), 500
+    finally:
+        cursor.close()
+        db.close()
 if __name__ == '__main__':
     app.run(debug=True)
