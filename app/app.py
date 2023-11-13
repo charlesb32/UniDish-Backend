@@ -92,7 +92,7 @@ def add_user():
         user_exists_by_email = cursor.fetchone()[0]  # fetchone returns a tuple, so we take the first element
         if user_exists_by_email:
             # User with this email already exists
-            return jsonify({'message': 'User with this email already exists'}), 400
+            return jsonify({'message': 'User with this email already exists!'}), 400
         cursor.execute("SELECT COUNT(*) FROM USERS WHERE username=%s", (user_data['username'],))
         user_exists_by_username = cursor.fetchone()[0]
         if user_exists_by_username:
@@ -411,17 +411,25 @@ def add_menu_item():
         db.close()
         return jsonify({'message': str(e)}), 500
 
-def get_review_likes(review_id):
-    print('REVIEW ID: ', review_id)
+def get_review_likes(post_id, post_type):
+    print('POST ID: ', post_id)
     db = mysql.connector.connect(**db_config)
     cursor = db.cursor(dictionary=True)
     try:
-        query = """
-        SELECT COUNT(*) AS likes_count
-        FROM review_likes
-        WHERE rreview_id = %s
-        """
-        cursor.execute(query, (review_id,))
+        query = ''
+        if post_type == 'review':
+            query = """
+            SELECT COUNT(*) AS likes_count
+            FROM review_likes
+            WHERE rreview_id = %s
+            """
+        elif post_type == 'comment':
+            query = """
+            SELECT COUNT(*) AS likes_count
+            FROM comment_likes
+            WHERE ccomment_id = %s
+            """
+        cursor.execute(query, (post_id,))
         result = cursor.fetchone()  # Fetch the result
         return result['likes_count'] if result else 0
     except Exception as e:
@@ -431,17 +439,25 @@ def get_review_likes(review_id):
         cursor.close()
         db.close()
 
-def get_review_dislikes(review_id):
-    print('REVIEW ID: ', review_id)
+def get_review_dislikes(post_id, post_type):
+    print('POST ID: ', post_id)
     db = mysql.connector.connect(**db_config)
     cursor = db.cursor(dictionary=True)
     try:
-        query = """
-        SELECT COUNT(*) AS dislikes_count
-        FROM review_dislikes
-        WHERE rreview_id = %s
-        """
-        cursor.execute(query, (review_id,))
+        query = ''
+        if post_type == 'review':
+            query = """
+            SELECT COUNT(*) AS dislikes_count
+            FROM review_dislikes
+            WHERE rreview_id = %s
+            """
+        elif post_type == 'comment':
+            query = """
+            SELECT COUNT(*) AS dislikes_count
+            FROM comment_dislikes
+            WHERE ccomment_id = %s
+            """
+        cursor.execute(query, (post_id,))
         result = cursor.fetchone()  # Fetch the result
         return result['dislikes_count'] if result else 0
     except Exception as e:
@@ -471,28 +487,49 @@ def get_user(user_id):
         cursor.close()
         db.close()
 
-def get_highlight(user_id, review_id):
+def get_highlight(user_id, post_id, post_type):
     db = mysql.connector.connect(**db_config)
     cursor = db.cursor(dictionary=True)
-    print('USER AND REVIEW IDS', user_id, review_id)
+    print('USER AND POST IDS', user_id, post_id)
     try:
-        like_query = """
-        SELECT * FROM review_likes
-        WHERE uuser_id = %s AND rreview_id = %s
-        """
-        cursor.execute(like_query, (user_id, review_id))
-        like_result = cursor.fetchone()  # Fetch the result
-        print('LIKE_RESULT: ',like_result)
-        if like_result:
-            return 'like'
-        dislike_query = """
-        SELECT * FROM review_dislikes
-        WHERE uuser_id = %s AND rreview_id = %s
-        """
-        cursor.execute(dislike_query, (user_id, review_id))
-        dislike_result = cursor.fetchone()  # Fetch the result
-        if dislike_result:
-            return 'dislike'
+        like_query = ''
+        dislike_query = ''
+        if post_type == 'review':
+            like_query = """
+            SELECT * FROM review_likes
+            WHERE uuser_id = %s AND rreview_id = %s
+            """
+            cursor.execute(like_query, (user_id, post_id))
+            like_result = cursor.fetchone()  # Fetch the result
+            print('LIKE_RESULT: ',like_result)
+            if like_result:
+                return 'like'
+            dislike_query = """
+            SELECT * FROM review_dislikes
+            WHERE uuser_id = %s AND rreview_id = %s
+            """
+            cursor.execute(dislike_query, (user_id, post_id))
+            dislike_result = cursor.fetchone()  # Fetch the result
+            if dislike_result:
+                return 'dislike'
+        elif post_type == 'comment':
+            like_query = """
+            SELECT * FROM comment_likes
+            WHERE uuser_id = %s AND ccomment_id = %s
+            """
+            cursor.execute(like_query, (user_id, post_id))
+            like_result = cursor.fetchone()  # Fetch the result
+            print('LIKE_RESULT: ',like_result)
+            if like_result:
+                return 'like'
+            dislike_query = """
+            SELECT * FROM comment_dislikes
+            WHERE uuser_id = %s AND ccomment_id = %s
+            """
+            cursor.execute(dislike_query, (user_id, post_id))
+            dislike_result = cursor.fetchone()  # Fetch the result
+            if dislike_result:
+                return 'dislike'
         return ''
     except Exception as e:
         print(f"Error getting highlight info: {e}")  # Properly log the exception or handle it.
@@ -517,10 +554,10 @@ def get_reviews_and_review_info():
         cursor.execute(query, (rest_id,))  # Note the comma for a single parameter
         reviews = cursor.fetchall()
         for review in reviews:
-            review['likes'] = get_review_likes(review['review_id'])
-            review['dislikes'] = get_review_dislikes(review['review_id'])
+            review['likes'] = get_review_likes(review['review_id'], 'review')
+            review['dislikes'] = get_review_dislikes(review['review_id'], 'review')
             review['user'] = get_user(review['user_id'])
-            review['highlight'] = get_highlight(curr_user_id, review['review_id'])
+            review['highlight'] = get_highlight(curr_user_id, review['review_id'], 'review')
         print('REVIEWS: ', reviews)
         cursor.close()
         db.close()
@@ -530,53 +567,92 @@ def get_reviews_and_review_info():
         db.close()
         return jsonify({'message': str(e)}), 500
 
-@app.route('/likeReview', methods=['POST'])
+@app.route('/like', methods=['POST'])
 def add_like():
     like_info = request.json['likeInfo']
     print(like_info)
     user_id = like_info['userId']
-    review_id = like_info['reviewId']
+    post_id = like_info['postId']
+    like_type = like_info['likeType']
     db = mysql.connector.connect(**db_config)
     cursor = db.cursor(dictionary=True)
     try:
+        if like_type == 'review':
         # Check if the user has already liked this review
-        cursor.execute("""
-            SELECT COUNT(*) AS like_count
-            FROM review_likes
-            WHERE uuser_id = %s AND rreview_id = %s
-        """, (user_id, review_id))
-        like_result = cursor.fetchone()
-
-        if like_result['like_count'] > 0:
-            #if already liked remove the like
             cursor.execute("""
-                DELETE FROM review_likes
+                SELECT COUNT(*) AS like_count
+                FROM review_likes
                 WHERE uuser_id = %s AND rreview_id = %s
-            """, (user_id, review_id))
-            db.commit()
-            return jsonify({'message': 'Review unliked'}), 200
-        # Check if the user has already disliked this review
-        cursor.execute("""
-            SELECT COUNT(*) AS dislike_count
-            FROM review_dislikes
-            WHERE uuser_id = %s AND rreview_id = %s
-        """, (user_id, review_id))
-        result = cursor.fetchone()
-        
-        if result['dislike_count'] > 0:
-            # User has disliked the review, remove the dislike
-            cursor.execute("""
-                DELETE FROM review_dislikes
-                WHERE uuser_id = %s AND rreview_id = %s
-            """, (user_id, review_id))
-            db.commit()
-        # Now add the like (after removing dislike if it was there)
-        cursor.execute("""
-            INSERT INTO review_likes (uuser_id, rreview_id)
-            VALUES (%s, %s)
-        """, (user_id, review_id))
-        db.commit()
+            """, (user_id, post_id))
+            like_result = cursor.fetchone()
 
+            if like_result['like_count'] > 0:
+                #if already liked remove the like
+                cursor.execute("""
+                    DELETE FROM review_likes
+                    WHERE uuser_id = %s AND rreview_id = %s
+                """, (user_id, post_id))
+                db.commit()
+                return jsonify({'message': 'Review unliked'}), 200
+            # Check if the user has already disliked this review
+            cursor.execute("""
+                SELECT COUNT(*) AS dislike_count
+                FROM review_dislikes
+                WHERE uuser_id = %s AND rreview_id = %s
+            """, (user_id, post_id))
+            result = cursor.fetchone()
+            
+            if result['dislike_count'] > 0:
+                # User has disliked the review, remove the dislike
+                cursor.execute("""
+                    DELETE FROM review_dislikes
+                    WHERE uuser_id = %s AND rreview_id = %s
+                """, (user_id, post_id))
+                db.commit()
+            # Now add the like (after removing dislike if it was there)
+            cursor.execute("""
+                INSERT INTO review_likes (uuser_id, rreview_id)
+                VALUES (%s, %s)
+            """, (user_id, post_id))
+            db.commit()
+        elif like_type == 'comment':
+        # Check if the user has already liked this review
+            cursor.execute("""
+                SELECT COUNT(*) AS like_count
+                FROM comment_likes
+                WHERE uuser_id = %s AND ccomment_id = %s
+            """, (user_id, post_id))
+            like_result = cursor.fetchone()
+
+            if like_result['like_count'] > 0:
+                #if already liked remove the like
+                cursor.execute("""
+                    DELETE FROM comment_likes
+                    WHERE uuser_id = %s AND ccomment_id = %s
+                """, (user_id, post_id))
+                db.commit()
+                return jsonify({'message': 'Review unliked'}), 200
+            # Check if the user has already disliked this review
+            cursor.execute("""
+                SELECT COUNT(*) AS dislike_count
+                FROM comment_dislikes
+                WHERE uuser_id = %s AND ccomment_id = %s
+            """, (user_id, post_id))
+            result = cursor.fetchone()
+            
+            if result['dislike_count'] > 0:
+                # User has disliked the review, remove the dislike
+                cursor.execute("""
+                    DELETE FROM comment_dislikes
+                    WHERE uuser_id = %s AND ccomment_id = %s
+                """, (user_id, post_id))
+                db.commit()
+            # Now add the like (after removing dislike if it was there)
+            cursor.execute("""
+                INSERT INTO comment_likes (uuser_id, ccomment_id)
+                VALUES (%s, %s)
+            """, (user_id, post_id))
+            db.commit()
         return jsonify({'message': 'Like added successfully'}), 200
 
     except Exception as e:
@@ -587,54 +663,94 @@ def add_like():
         cursor.close()
         db.close()
 
-@app.route('/dislikeReview', methods=['POST'])
+@app.route('/dislike', methods=['POST'])
 def add_dislike():
     dislike_info = request.json['dislikeInfo']
     print(dislike_info)
     user_id = dislike_info['userId']
-    review_id = dislike_info['reviewId']
+    post_id = dislike_info['postId']
+    dislike_type = dislike_info['dislikeType']
     db = mysql.connector.connect(**db_config)
     cursor = db.cursor(dictionary=True)
     try:
-        # Check if the user has already disliked this review
-        cursor.execute("""
-            SELECT COUNT(*) AS dislike_count
-            FROM review_dislikes
-            WHERE uuser_id = %s AND rreview_id = %s
-        """, (user_id, review_id))
-        dislike_result = cursor.fetchone()
-
-        if dislike_result['dislike_count'] > 0:
-            # User has already disliked the review, remove dislike
+        if dislike_type == 'review':
+            # Check if the user has already disliked this review
             cursor.execute("""
-                DELETE FROM review_dislikes
+                SELECT COUNT(*) AS dislike_count
+                FROM review_dislikes
                 WHERE uuser_id = %s AND rreview_id = %s
-            """, (user_id, review_id))
-            db.commit()
-            return jsonify({'message': 'Review undisliked'}), 200
-        # Check if the user has already liked this review
-        cursor.execute("""
-            SELECT COUNT(*) AS like_count
-            FROM review_likes
-            WHERE uuser_id = %s AND rreview_id = %s
-        """, (user_id, review_id))
-        result = cursor.fetchone()
-        
-        if result['like_count'] > 0:
-            # User has liked the review, remove the like
+            """, (user_id, post_id))
+            dislike_result = cursor.fetchone()
+
+            if dislike_result['dislike_count'] > 0:
+                # User has already disliked the review, remove dislike
+                cursor.execute("""
+                    DELETE FROM review_dislikes
+                    WHERE uuser_id = %s AND rreview_id = %s
+                """, (user_id, post_id))
+                db.commit()
+                return jsonify({'message': 'Review undisliked'}), 200
+            # Check if the user has already liked this review
             cursor.execute("""
-                DELETE FROM review_likes
+                SELECT COUNT(*) AS like_count
+                FROM review_likes
                 WHERE uuser_id = %s AND rreview_id = %s
-            """, (user_id, review_id))
+            """, (user_id, post_id))
+            result = cursor.fetchone()
+            
+            if result['like_count'] > 0:
+                # User has liked the review, remove the like
+                cursor.execute("""
+                    DELETE FROM review_likes
+                    WHERE uuser_id = %s AND rreview_id = %s
+                """, (user_id, post_id))
+                db.commit()
+
+            # Now add the dislike (after removing like if it was there)
+            cursor.execute("""
+                INSERT INTO review_dislikes (uuser_id, rreview_id)
+                VALUES (%s, %s)
+            """, (user_id, post_id))
             db.commit()
+        elif dislike_type == 'comment':
+            # Check if the user has already disliked this review
+            cursor.execute("""
+                SELECT COUNT(*) AS dislike_count
+                FROM comment_dislikes
+                WHERE uuser_id = %s AND ccomment_id = %s
+            """, (user_id, post_id))
+            dislike_result = cursor.fetchone()
 
-        # Now add the dislike (after removing like if it was there)
-        cursor.execute("""
-            INSERT INTO review_dislikes (uuser_id, rreview_id)
-            VALUES (%s, %s)
-        """, (user_id, review_id))
-        db.commit()
+            if dislike_result['dislike_count'] > 0:
+                # User has already disliked the review, remove dislike
+                cursor.execute("""
+                    DELETE FROM comment_dislikes
+                    WHERE uuser_id = %s AND ccomment_id = %s
+                """, (user_id, post_id))
+                db.commit()
+                return jsonify({'message': 'Review undisliked'}), 200
+            # Check if the user has already liked this review
+            cursor.execute("""
+                SELECT COUNT(*) AS like_count
+                FROM comment_likes
+                WHERE uuser_id = %s AND ccomment_id = %s
+            """, (user_id, post_id))
+            result = cursor.fetchone()
+            
+            if result['like_count'] > 0:
+                # User has liked the review, remove the like
+                cursor.execute("""
+                    DELETE FROM comment_likes
+                    WHERE uuser_id = %s AND ccomment_id = %s
+                """, (user_id, post_id))
+                db.commit()
 
+            # Now add the dislike (after removing like if it was there)
+            cursor.execute("""
+                INSERT INTO comment_dislikes (uuser_id, ccomment_id)
+                VALUES (%s, %s)
+            """, (user_id, post_id))
+            db.commit()
         return jsonify({'message': 'Dislike added successfully'}), 200
 
     except Exception as e:
@@ -690,5 +806,55 @@ def create_review():
     finally:
         cursor.close()
         db.close()
+
+@app.route('/createComment', methods=['POST'])
+def create_comment():
+    db = mysql.connector.connect(**db_config)
+    cursor = db.cursor(dictionary=True)
+    comment_info = request.json['commentInfo']
+    description = comment_info['description']
+    user_id = comment_info['userId']
+    date = comment_info['date']
+    review_id = comment_info['reviewId']
+    try:
+        cursor.execute("""
+        INSERT INTO comments (description, user_id, review_id, date)
+        VALUES (%s, %s, %s, %s)
+        """, (description, user_id, review_id, date))
+        db.commit()
+        return jsonify({'message': 'Comment added successfully'}), 200
+    except Exception as e:
+        print(f"Error in create_comment: {e}")
+        return jsonify({'message': str(e)}), 500
+    finally:
+        cursor.close()
+        db.close()
+
+@app.route('/getComments', methods=['GET'])
+def get_review_comments():
+    db = mysql.connector.connect(**db_config)
+    cursor = db.cursor(dictionary=True)
+    review_id = request.args.get('reviewId')
+    curr_user_id = request.args.get('currUserId')
+    # print('REST_ID:!!!!!!!!! ', rest_id)
+    try:
+        query = "SELECT * FROM comments WHERE review_id = %s ORDER BY date DESC"
+        cursor.execute(query, (review_id,))
+        comments = cursor.fetchall()
+        for comment in comments:    
+            comment['likes'] = get_review_likes(comment['comment_id'], 'comment')
+            comment['dislikes'] = get_review_dislikes(comment['comment_id'], 'comment')
+            comment['user'] = get_user(comment['user_id'])
+            comment['highlight'] =  get_highlight(curr_user_id, comment['comment_id'], 'comment')
+            print('COMMENTS: ', comments)
+        return jsonify({'comment': comments}), 200
+        
+    except Exception as e:
+        print(f"Error in get_review_comments: {e}")
+        return jsonify({'message': str(e)}), 500
+    finally:
+        cursor.close()
+        db.close()
+
 if __name__ == '__main__':
     app.run(debug=True)
