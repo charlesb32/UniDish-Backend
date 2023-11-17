@@ -24,12 +24,7 @@ db_config = {
     "database": "unidashdb"
 }
 
-# Create a MySQL connection
-db = mysql.connector.connect(**db_config)
 
-# Create a cursor to interact with the database
-cursor = db.cursor()
-# print('hgadsfad')
 @app.route('/check_db_connection', methods=['GET'])
 def check_db_connection():
     try:
