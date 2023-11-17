@@ -994,16 +994,18 @@ def get_top_three_most_active_users_report():
 
     # SQL query to fetch the top 3 users based on total comments and reviews
     query = """
-    SELECT user_id, SUM(total_activities) as total_activities
+    SELECT u.username, SUM(total_activities) as total_activities
     FROM (
         SELECT user_id, COUNT(*) as total_activities FROM reviews GROUP BY user_id
         UNION ALL
         SELECT user_id, COUNT(*) FROM comments GROUP BY user_id
     ) as combined
-    GROUP BY user_id
+    INNER JOIN users u ON combined.user_id = u.user_id
+    GROUP BY combined.user_id
     ORDER BY total_activities DESC
     LIMIT 3
     """
+
 
     cursor.execute(query)
     results = cursor.fetchall()
@@ -1012,17 +1014,17 @@ def get_top_three_most_active_users_report():
     db.close()
 
     # Process the results for plotting
-    user_ids = [result['user_id'] for result in results]
+    usernames = [result['username'] for result in results]
     activities = [result['total_activities'] for result in results]
 
     # Generate the bar chart
     plt.figure(figsize=(10, 5))
-    plt.bar(user_ids, activities, color='blue')
+    plt.bar(usernames, activities, color='blue')
     plt.title('Top 3 Most Active Users')
-    plt.xlabel('User ID')
+    plt.xlabel('Username')
     plt.ylabel('Total Number of Comments and Reviews')
 
-    plt.xticks(user_ids)  # Set user IDs as x-axis labels
+    plt.xticks(usernames)  # Set user IDs as x-axis labels
     plt.tight_layout()
 
     # Save the plot to a BytesIO object
