@@ -8,14 +8,14 @@ def get_dining_halls_with_restaurants():
     db = get_db_connection()
     cursor = db.cursor()
     try:
-        cursor.execute("SELECT * FROM DINING_HALLS")
+        cursor.execute("SELECT * FROM dining_halls")
         dining_halls = cursor.fetchall()
         # print('DINING HALLS: ', dining_halls)
         result = []
         for dining_hall in dining_halls:
             dh_id, dh_name, dh_address, dh_rating, dh_description = dining_hall
             # print('DINING HALL: ', dh_id)
-            cursor.execute("SELECT * FROM RESTAURANTS WHERE dining_hall_id=%s", (dh_id,))
+            cursor.execute("SELECT * FROM restaurants WHERE dining_hall_id=%s", (dh_id,))
             restaurants = cursor.fetchall()
             # print('RESTAURANTS: ', restaurants)
             restaurants_list = [{
@@ -46,7 +46,7 @@ def get_restaurant_by_id():
     try:
         rest_id = request.args.get('restId')
         # print(rest_id)
-        cursor.execute("SELECT * FROM RESTAURANTS WHERE restaurant_id=%s", (rest_id,))
+        cursor.execute("SELECT * FROM restaurants WHERE restaurant_id=%s", (rest_id,))
         restaurant = cursor.fetchone()
         cursor.close()
         db.close()
@@ -81,7 +81,7 @@ def add_dining_hall():
     cursor = db.cursor()
     # print(dining_hall_data)
     try:
-        cursor.execute('INSERT INTO DINING_HALLS (dining_hall_name, description, dining_hall_address) VALUES (%s, %s, %s)', (dining_hall_data['name'], dining_hall_data['description'], dining_hall_data['address']))
+        cursor.execute('INSERT INTO dining_halls (dining_hall_name, description, dining_hall_address) VALUES (%s, %s, %s)', (dining_hall_data['name'], dining_hall_data['description'], dining_hall_data['address']))
         db.commit()
         cursor.close()
         db.close()
@@ -98,7 +98,7 @@ def add_restaurant():
     cursor = db.cursor()
     # print(rest_data)
     try:
-        cursor.execute('INSERT INTO RESTAURANTS (name, description, dining_hall_id) VALUES (%s, %s, %s)', (rest_data['name'], rest_data['description'], rest_data['diningHallId']))
+        cursor.execute('INSERT INTO restaurants (name, description, dining_hall_id) VALUES (%s, %s, %s)', (rest_data['name'], rest_data['description'], rest_data['diningHallId']))
         db.commit()
         cursor.close()
         db.close()
@@ -113,7 +113,7 @@ def delete_restaurant(rest_id):
     db = get_db_connection()
     cursor = db.cursor()
     try:
-        cursor.execute("DELETE FROM RESTAURANTS WHERE restaurant_id = %s", (rest_id,))
+        cursor.execute("DELETE FROM restaurants WHERE restaurant_id = %s", (rest_id,))
         db.commit()
         cursor.close()
         db.close()
@@ -128,7 +128,7 @@ def delete_dining_hall(dining_hall_id):
     db = get_db_connection()
     cursor = db.cursor()
     try:
-        cursor.execute("DELETE FROM DINING_HALLS WHERE dining_hall_id = %s", (dining_hall_id,))
+        cursor.execute("DELETE FROM dining_halls WHERE dining_hall_id = %s", (dining_hall_id,))
         db.commit()
         cursor.close()
         db.close()
@@ -145,7 +145,7 @@ def edit_restaurant():
     cursor = db.cursor()
     # print(rest)
     try:
-        cursor.execute("UPDATE RESTAURANTS SET name = %s, description = %s WHERE restaurant_id=%s", (rest['name'], rest['description'], rest['diningHallId']))
+        cursor.execute("UPDATE restaurants SET name = %s, description = %s WHERE restaurant_id=%s", (rest['name'], rest['description'], rest['diningHallId']))
         db.commit()
         cursor.close()
         db.close()
@@ -162,7 +162,7 @@ def edit_dining_hall():
     cursor = db.cursor()
     # print(dining_hall)
     try:
-        cursor.execute("UPDATE DINING_HALLS SET dining_hall_name = %s, description = %s, dining_hall_address = %s WHERE dining_hall_id=%s", (dining_hall['name'], dining_hall['description'], dining_hall['address'], dining_hall['id']))
+        cursor.execute("UPDATE dining_halls SET dining_hall_name = %s, description = %s, dining_hall_address = %s WHERE dining_hall_id=%s", (dining_hall['name'], dining_hall['description'], dining_hall['address'], dining_hall['id']))
         db.commit()
         cursor.close()
         db.close()
@@ -179,7 +179,7 @@ def edit_menu_item():
     cursor = db.cursor()
     # print(menu_item)
     try:
-        cursor.execute("UPDATE MENU_ITEMS SET name = %s, description = %s, calorie_count = %s, price = %s WHERE menu_item_id= %s", (menu_item['name'], menu_item['description'], menu_item['calories'],  menu_item['price'], menu_item['id']))
+        cursor.execute("UPDATE menu_items SET name = %s, description = %s, calorie_count = %s, price = %s WHERE menu_item_id= %s", (menu_item['name'], menu_item['description'], menu_item['calories'],  menu_item['price'], menu_item['id']))
         db.commit()
         cursor.close()
         db.close()
@@ -195,7 +195,7 @@ def delete_menu_item(menu_item_id):
     db = get_db_connection()
     cursor = db.cursor()
     try:
-        cursor.execute("DELETE FROM MENU_ITEMS WHERE menu_item_id = %s", (menu_item_id,))
+        cursor.execute("DELETE FROM menu_items WHERE menu_item_id = %s", (menu_item_id,))
         db.commit()
         cursor.close()
         db.close()
@@ -212,7 +212,7 @@ def add_menu_item():
     cursor = db.cursor()
     # print(menu_item)
     try:
-        cursor.execute('INSERT INTO MENU_ITEMS (name, description, calorie_count, price, restaurant_id) VALUES (%s, %s, %s, %s, %s)', (menu_item['name'], menu_item['description'], menu_item['calories'], menu_item['price'], menu_item['restaurantId']))
+        cursor.execute('INSERT INTO menu_items (name, description, calorie_count, price, restaurant_id) VALUES (%s, %s, %s, %s, %s)', (menu_item['name'], menu_item['description'], menu_item['calories'], menu_item['price'], menu_item['restaurantId']))
         db.commit()
         cursor.close()
         db.close()

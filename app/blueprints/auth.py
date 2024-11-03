@@ -23,12 +23,12 @@ def add_user():
     # db = mysql.connector.connect(**db_config)
     cursor = db.cursor()
     try:
-        cursor.execute("SELECT COUNT(*) FROM USERS WHERE email=%s", (user_data['email'],))
+        cursor.execute("SELECT COUNT(*) FROM users WHERE email=%s", (user_data['email'],))
         user_exists_by_email = cursor.fetchone()[0]  # fetchone returns a tuple, so we take the first element
         if user_exists_by_email:
             # User with this email already exists
             return jsonify({'message': 'User with this email already exists!'}), 400
-        cursor.execute("SELECT COUNT(*) FROM USERS WHERE username=%s", (user_data['username'],))
+        cursor.execute("SELECT COUNT(*) FROM users WHERE username=%s", (user_data['username'],))
         user_exists_by_username = cursor.fetchone()[0]
         if user_exists_by_username:
             return jsonify({'message': 'User with this username already exists'}), 400
@@ -113,7 +113,7 @@ def update_user_info():
     user_info = request.json['userInfo']
     # print('USERINFO', user_info)
     try:
-        cursor.execute("UPDATE USERS SET profile_description = %s WHERE email = %s", (user_info['profile_description'], user_info['email']) )
+        cursor.execute("UPDATE users SET profile_description = %s WHERE email = %s", (user_info['profile_description'], user_info['email']) )
         db.commit()
         cursor.close()
         db.close()
@@ -139,7 +139,7 @@ def update_password():
             if password['newPassword'] == password['confirmNewPassword']:
                 #update password to new pass
                 hashed_password = bcrypt.generate_password_hash(password['newPassword']).decode('utf-8')
-                cursor.execute("UPDATE USERS SET password = %s WHERE user_id = %s", (hashed_password, user_id) )
+                cursor.execute("UPDATE users SET password = %s WHERE user_id = %s", (hashed_password, user_id) )
                 db.commit()
                 cursor.close()
                 db.close()
