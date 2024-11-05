@@ -1,7 +1,8 @@
 from ..data_access.restaurant_dao import RestaurantDAO
 from ..models.restaurant import Restaurant
+from app.services.restaurant_service_interface import IRestaurantService
 
-class RestaurantService:
+class RestaurantService(IRestaurantService):
     def __init__(self, restaurant_dao: RestaurantDAO):
         self.restaurant_dao = restaurant_dao
 

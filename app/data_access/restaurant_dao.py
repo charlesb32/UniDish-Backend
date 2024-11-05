@@ -1,6 +1,8 @@
-from app.models.restaurant import Restaurant
+from app.data_access.restaurant_dao_interface import IRestaurantDAO
+# from ..models.restaurant import Restaurant
+# from restaurant_dao_interface import IRestaurantDAO
 
-class RestaurantDAO:
+class RestaurantDAO(IRestaurantDAO):
     def __init__(self, db_connection):
         self.db = db_connection
 
