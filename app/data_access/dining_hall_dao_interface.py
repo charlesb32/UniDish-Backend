@@ -13,3 +13,11 @@ class IDiningHallDAO(ABC):
     @abstractmethod
     def update_dining_hall(self, dining_hall: DiningHall):
         pass
+    
+    @abstractmethod
+    def get_all_dining_halls(self):
+        pass
+    
+    @abstractmethod
+    def get_restaurants_by_dining_hall(self, dining_hall_id):
+        pass

@@ -3,58 +3,58 @@ from ..services.database import get_db_connection
 
 dining_blueprint = Blueprint('dining', __name__)
 
-@dining_blueprint.route('/getDiningHallsWithRestaurants', methods=['GET'])
-def get_dining_halls_with_restaurants():
-    db = get_db_connection()
-    cursor = db.cursor()
-    try:
-        cursor.execute("SELECT * FROM dining_halls")
-        dining_halls = cursor.fetchall()
-        # print('DINING HALLS: ', dining_halls)
-        result = []
-        for dining_hall in dining_halls:
-            dh_id, dh_name, dh_address, dh_rating, dh_description = dining_hall
-            # print('DINING HALL: ', dh_id)
-            cursor.execute("SELECT * FROM restaurants WHERE dining_hall_id=%s", (dh_id,))
-            restaurants = cursor.fetchall()
-            # print('RESTAURANTS: ', restaurants)
-            restaurants_list = [{
-                'id': r[0],
-                'name': r[1],
-                'overall_rating': r[2],
-                'description' : r[3],
-                'menu_name': r[4],
-                'menu_description': r[5],
-                'dining_hall_id': r[6]
-                } for r in restaurants]
-            result.append({
-                'dining_hall': dining_hall,
-                'restaurants': restaurants_list
-                })
-        cursor.close()
-        db.close()
-        return jsonify({'dining_halls': result})
-    except Exception as e:
-        cursor.close()
-        db.close()
-        return jsonify({'message': str(e)}), 500
+# @dining_blueprint.route('/getDiningHallsWithRestaurants', methods=['GET'])
+# def get_dining_halls_with_restaurants():
+#     db = get_db_connection()
+#     cursor = db.cursor()
+#     try:
+#         cursor.execute("SELECT * FROM dining_halls")
+#         dining_halls = cursor.fetchall()
+#         # print('DINING HALLS: ', dining_halls)
+#         result = []
+#         for dining_hall in dining_halls:
+#             dh_id, dh_name, dh_address, dh_rating, dh_description = dining_hall
+#             # print('DINING HALL: ', dh_id)
+#             cursor.execute("SELECT * FROM restaurants WHERE dining_hall_id=%s", (dh_id,))
+#             restaurants = cursor.fetchall()
+#             # print('RESTAURANTS: ', restaurants)
+#             restaurants_list = [{
+#                 'id': r[0],
+#                 'name': r[1],
+#                 'overall_rating': r[2],
+#                 'description' : r[3],
+#                 'menu_name': r[4],
+#                 'menu_description': r[5],
+#                 'dining_hall_id': r[6]
+#                 } for r in restaurants]
+#             result.append({
+#                 'dining_hall': dining_hall,
+#                 'restaurants': restaurants_list
+#                 })
+#         cursor.close()
+#         db.close()
+#         return jsonify({'dining_halls': result})
+#     except Exception as e:
+#         cursor.close()
+#         db.close()
+#         return jsonify({'message': str(e)}), 500
 
-@dining_blueprint.route('/getRestaurantById', methods=['GET'])
-def get_restaurant_by_id():
-    db = get_db_connection()
-    cursor = db.cursor()
-    try:
-        rest_id = request.args.get('restId')
-        # print(rest_id)
-        cursor.execute("SELECT * FROM restaurants WHERE restaurant_id=%s", (rest_id,))
-        restaurant = cursor.fetchone()
-        cursor.close()
-        db.close()
-        return jsonify({'restaurant': restaurant})
-    except Exception as e:
-        cursor.close()
-        db.close()
-        return jsonify({'message': str(e)}), 500
+# @dining_blueprint.route('/getRestaurantById', methods=['GET'])
+# def get_restaurant_by_id():
+#     db = get_db_connection()
+#     cursor = db.cursor()
+#     try:
+#         rest_id = request.args.get('restId')
+#         # print(rest_id)
+#         cursor.execute("SELECT * FROM restaurants WHERE restaurant_id=%s", (rest_id,))
+#         restaurant = cursor.fetchone()
+#         cursor.close()
+#         db.close()
+#         return jsonify({'restaurant': restaurant})
+#     except Exception as e:
+#         cursor.close()
+#         db.close()
+#         return jsonify({'message': str(e)}), 500
     
 
 @dining_blueprint.route('/getMenuItemsForRestaurant', methods=['GET'])

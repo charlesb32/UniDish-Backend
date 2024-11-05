@@ -42,3 +42,19 @@ class DiningHallDAO(IDiningHallDAO):
             raise e
         finally:
             cursor.close()
+    
+    def get_all_dining_halls(self):
+        cursor = self.db.cursor()
+        try:
+            cursor.execute("SELECT * FROM dining_halls")
+            return cursor.fetchall()
+        finally:
+            cursor.close()
+    
+    def get_restaurants_by_dining_hall(self, dining_hall_id):
+        cursor = self.db.cursor()
+        try:
+            cursor.execute("SELECT * FROM restaurants WHERE dining_hall_id=%s", (dining_hall_id,))
+            return cursor.fetchall()  # Return raw data (list of tuples)
+        finally:
+            cursor.close()

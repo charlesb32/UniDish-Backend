@@ -38,3 +38,11 @@ class DiningHallController:
             return jsonify({"error": str(ve)}), 400
         except Exception as e:
             return jsonify({"error": str(e)}), 500
+    
+    @dining_hall_blueprint.route('/getDiningHallsWithRestaurants', methods=['GET'])
+    def get_dining_halls_with_restaurants(self):
+        try:
+            dining_halls_with_restaurants = self.dining_hall_service.get_dining_halls_with_restaurants()
+            return jsonify({'dining_halls': dining_halls_with_restaurants}), 200
+        except Exception as e:
+            return jsonify({'message': str(e)}), 500

@@ -58,6 +58,7 @@ def create_app():
     app.add_url_rule('/api/diningHalls/addDiningHall', 'add_dining_hall', lambda: dining_hall_controller.add_dining_hall(), methods=['POST'])
     app.add_url_rule('/api/diningHalls/deleteDiningHall/<int:dining_hall_id>', 'delete_dining_hall', lambda dining_hall_id: dining_hall_controller.delete_dining_hall(dining_hall_id), methods=['DELETE'])
     app.add_url_rule('/api/diningHalls/updateDiningHall', 'update_dining_hall', lambda: dining_hall_controller.edit_dining_hall(), methods=['PUT'])
+    app.add_url_rule('/api/diningHalls/getDiningHallsWithRestaurants', 'get_dining_halls_with_restaurants', lambda: dining_hall_controller.get_dining_halls_with_restaurants(), methods=["GET"])
 
     app.register_blueprint(auth_blueprint)
     app.register_blueprint(dining_blueprint)

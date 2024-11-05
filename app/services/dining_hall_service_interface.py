@@ -13,3 +13,7 @@ class IDiningHallService(ABC):
     @abstractmethod
     def update_dining_hall(self, dining_hall: DiningHall):
         pass
+    
+    @abstractmethod
+    def get_dining_halls_with_restaurants(self):
+        pass
