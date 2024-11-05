@@ -121,7 +121,7 @@ def get_menu_items_for_restaurant():
 #     except Exception as e:
 #         cursor.close()
 #         db.close()  
-        return jsonify({'message': str(e)}), 500
+        # return jsonify({'message': str(e)}), 500
 
 # @dining_blueprint.route('/deleteDiningHall/<int:dining_hall_id>', methods=['DELETE'])
 # def delete_dining_hall(dining_hall_id):

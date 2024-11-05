@@ -1,4 +1,3 @@
-from ..data_access.dining_hall_dao import DiningHallDAO
 from ..models.dining_hall import DiningHall
 from app.services.dining_hall_service_interface import IDiningHallService
 from app.data_access.dining_hall_dao_interface import IDiningHallDAO
@@ -8,7 +7,6 @@ class DiningHallService(IDiningHallService):
         self.dining_hall_dao = dining_hall_dao
 
     def add_dining_hall(self, dining_hall_data):
-        # Validation and business logic can go here
         if not dining_hall_data.get('name') or not dining_hall_data.get('address'):
             raise ValueError("Dining hall name and address are required")
 
@@ -18,7 +16,6 @@ class DiningHallService(IDiningHallService):
             address=dining_hall_data['address']
         )
 
-        # Call DAO to save dining hall
         self.dining_hall_dao.add_dining_hall(dining_hall)
 
     def delete_dining_hall(self, dining_hall_id):

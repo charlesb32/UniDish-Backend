@@ -1,6 +1,4 @@
 from app.data_access.restaurant_dao_interface import IRestaurantDAO
-# from ..models.restaurant import Restaurant
-# from restaurant_dao_interface import IRestaurantDAO
 
 class RestaurantDAO(IRestaurantDAO):
     def __init__(self, db_connection):
@@ -21,7 +19,6 @@ class RestaurantDAO(IRestaurantDAO):
             cursor.close()
 
     def delete_restaurant(self, restaurant_id):
-        print('DAO', restaurant_id)
         cursor = self.db.cursor()
         try:
             cursor.execute("DELETE FROM restaurants WHERE restaurant_id = %s", (restaurant_id,))
@@ -40,6 +37,18 @@ class RestaurantDAO(IRestaurantDAO):
                 (restaurant.name, restaurant.description, restaurant.id)
             )
             self.db.commit()
+        except Exception as e:
+            self.db.rollback()
+            raise e
+        finally:
+            cursor.close()
+    
+    def get_restaurant(self, restaurant_id):
+        cursor = self.db.cursor()
+        try:
+            cursor.execute("SELECT * FROM restaurants WHERE restaurant_id=%s", (restaurant_id,))
+            restaurant = cursor.fetchone()
+            return restaurant
         except Exception as e:
             self.db.rollback()
             raise e

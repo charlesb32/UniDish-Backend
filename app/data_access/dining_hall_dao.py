@@ -1,4 +1,3 @@
-from app.models.dining_hall import DiningHall
 from app.data_access.dining_hall_dao_interface import IDiningHallDAO
 
 class DiningHallDAO(IDiningHallDAO):

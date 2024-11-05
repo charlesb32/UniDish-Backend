@@ -1,4 +1,3 @@
-from ..data_access.restaurant_dao import RestaurantDAO
 from ..models.restaurant import Restaurant
 from app.services.restaurant_service_interface import IRestaurantService
 from app.data_access.restaurant_dao_interface import IRestaurantDAO
@@ -22,14 +21,12 @@ class RestaurantService(IRestaurantService):
         self.restaurant_dao.add_restaurant(restaurant)
 
     def delete_restaurant(self, restaurant_id):
-        print('service')
         if not restaurant_id:
             raise ValueError("Restaurant ID is required")
 
         self.restaurant_dao.delete_restaurant(restaurant_id)
     
     def update_restaurant(self, restaurant_data):
-        print("SERVICE", restaurant_data)
         if not restaurant_data.get('id'):
             raise ValueError("Restaurant ID is required")
         if not restaurant_data.get('name'):
@@ -41,6 +38,15 @@ class RestaurantService(IRestaurantService):
             description=restaurant_data['description'],
             dining_hall_id=restaurant_data['diningHallId']
         )
-        print("rest object: ", restaurant)
 
         self.restaurant_dao.update_restaurant(restaurant)
+
+    def get_restaurant(self, restaurant_id: int):
+        if not restaurant_id:
+            raise ValueError("Restaurant ID is required")
+
+        restaurant = self.restaurant_dao.get_restaurant(restaurant_id)
+        if restaurant is None:
+            raise ValueError(f"Restaurant with ID {restaurant_id} not found")
+        
+        return restaurant

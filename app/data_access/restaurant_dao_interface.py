@@ -13,3 +13,7 @@ class IRestaurantDAO(ABC):
     @abstractmethod
     def update_restaurant(self, restaurant: Restaurant):
         pass
+    
+    @abstractmethod
+    def get_restaurant(self, restaurant_id: int):
+        pass
