@@ -1,6 +1,7 @@
 from app.models.dining_hall import DiningHall
+from app.data_access.dining_hall_dao_interface import IDiningHallDAO
 
-class DiningHallDAO:
+class DiningHallDAO(IDiningHallDAO):
     def __init__(self, db_connection):
         self.db = db_connection
 

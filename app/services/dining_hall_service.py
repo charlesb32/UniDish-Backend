@@ -1,8 +1,10 @@
 from ..data_access.dining_hall_dao import DiningHallDAO
 from ..models.dining_hall import DiningHall
+from app.services.dining_hall_service_interface import IDiningHallService
+from app.data_access.dining_hall_dao_interface import IDiningHallDAO
 
-class DiningHallService:
-    def __init__(self, dining_hall_dao: DiningHallDAO):
+class DiningHallService(IDiningHallService):
+    def __init__(self, dining_hall_dao: IDiningHallDAO):
         self.dining_hall_dao = dining_hall_dao
 
     def add_dining_hall(self, dining_hall_data):
