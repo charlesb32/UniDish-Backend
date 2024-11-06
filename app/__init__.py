@@ -3,7 +3,7 @@ from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from .blueprints.auth import auth_blueprint, init_auth_blueprint
-from .blueprints.dining import dining_blueprint
+# from .blueprints.dining import dining_blueprint
 from .blueprints.posts import posts_blueprint
 from .blueprints.statistic_reports import statistic_reports_blueprint
 
@@ -21,24 +21,34 @@ from app.controllers.menu_item_controller import MenuItemController
 from app.data_access.menu_item_dao import MenuItemDAO
 from app.services.menu_item_service import MenuItemService
 
+from app.controllers.review_controller import ReviewController
+from app.data_access.review_dao import ReviewDAO
+from app.services.review_service import ReviewService
+
 def setup_dao(db_connection):
     restaurant_dao = RestaurantDAO(db_connection)
     dining_hall_dao = DiningHallDAO(db_connection)
     menu_item_dao = MenuItemDAO(db_connection)
+    review_dao = ReviewDAO(db_connection)
+    
     return{
         "restaurant_dao": restaurant_dao,
         "dining_hall_dao": dining_hall_dao,
         "menu_item_dao": menu_item_dao,
+        'review_dao': review_dao
     }
 
 def setup_service(dao_map):
     restaurant_service = RestaurantService(dao_map['restaurant_dao'])
     dining_hall_service = DiningHallService(dao_map["dining_hall_dao"])
     menu_item_service = MenuItemService(dao_map['menu_item_dao'])
+    review_service = ReviewService(dao_map['review_dao'])
+    
     return {
         "restaurant_service" : restaurant_service,
         "dining_hall_service" : dining_hall_service,
-        "menu_item_service": menu_item_service
+        "menu_item_service": menu_item_service,
+        "review_service": review_service
     }
 
 def create_app():
@@ -58,6 +68,7 @@ def create_app():
     restaurant_controller = RestaurantController(service_map['restaurant_service'])
     dining_hall_controller = DiningHallController(service_map["dining_hall_service"])
     menu_item_controller = MenuItemController(service_map['menu_item_service'])
+    review_controller = ReviewController(service_map['review_service'])
     
     # Register routes by wrapping the instance methods
     app.add_url_rule('/api/restaurants/addRestaurant', 'add_restaurant', lambda: restaurant_controller.add_restaurant(), methods=['POST'])
@@ -75,8 +86,10 @@ def create_app():
     app.add_url_rule('/api/menuItems/deleteMenuItem/<int:menu_item_id>', 'delete_menu_item', lambda menu_item_id: menu_item_controller.delete_menu_item(menu_item_id), methods=['DELETE'])
     app.add_url_rule('/api/menuItems/getMenuItemsForRestaurant/<int:restaurant_id>', 'get_menu_items_for_restaurant', lambda restaurant_id: menu_item_controller.get_menu_items_for_restaurant(restaurant_id), methods=['GET'])
 
+    app.add_url_rule('/api/reviews/addReview', 'add_review', lambda: review_controller.add_review(), methods=['POST'])
+    
     app.register_blueprint(auth_blueprint)
-    app.register_blueprint(dining_blueprint)
+    # app.register_blueprint(dining_blueprint)
     app.register_blueprint(posts_blueprint)
     app.register_blueprint(statistic_reports_blueprint)
     # app.register_blueprint(dining_hall_blueprint, url_prefix='/api/diningHalls')

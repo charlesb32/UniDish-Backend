@@ -1,7 +1,7 @@
-from flask import Blueprint, jsonify, request
-from ..services.database import get_db_connection
+# from flask import Blueprint, jsonify, request
+# from ..services.database import get_db_connection
 
-dining_blueprint = Blueprint('dining', __name__)
+# dining_blueprint = Blueprint('dining', __name__)
 
 # @dining_blueprint.route('/getDiningHallsWithRestaurants', methods=['GET'])
 # def get_dining_halls_with_restaurants():
