@@ -72,6 +72,6 @@ class DiningHallService(IDiningHallService):
                 'dining_hall': dining_hall.to_dict(),
                 'restaurants': restaurants_list
             })
-
+            
         return result
             

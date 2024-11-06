@@ -57,22 +57,22 @@ dining_blueprint = Blueprint('dining', __name__)
 #         return jsonify({'message': str(e)}), 500
     
 
-@dining_blueprint.route('/getMenuItemsForRestaurant', methods=['GET'])
-def get_menu_items_for_restaurant():
-    db = get_db_connection()
-    cursor = db.cursor()
-    try:
-        rest_id = request.args.get('restId')
-        # print(rest_id)
-        cursor.execute("SELECT * FROM menu_items WHERE restaurant_id=%s", (rest_id,))
-        menu_items = cursor.fetchall()
-        cursor.close()
-        db.close()
-        return jsonify({'menu_items': menu_items})
-    except Exception as e:
-        cursor.close()
-        db.close()
-        return jsonify({'message': str(e)}), 500
+# @dining_blueprint.route('/getMenuItemsForRestaurant', methods=['GET'])
+# def get_menu_items_for_restaurant():
+#     db = get_db_connection()
+#     cursor = db.cursor()
+#     try:
+#         rest_id = request.args.get('restId')
+#         # print(rest_id)
+#         cursor.execute("SELECT * FROM menu_items WHERE restaurant_id=%s", (rest_id,))
+#         menu_items = cursor.fetchall()
+#         cursor.close()
+#         db.close()
+#         return jsonify({'menu_items': menu_items})
+#     except Exception as e:
+#         cursor.close()
+#         db.close()
+#         return jsonify({'message': str(e)}), 500
 
 # @dining_blueprint.route('/addDiningHall', methods=['POST'])
 # def add_dining_hall():
@@ -172,52 +172,52 @@ def get_menu_items_for_restaurant():
 #         db.close()  
 #         return jsonify({'message': str(e)}), 500
 
-@dining_blueprint.route('/editMenuItem', methods=['PUT'])
-def edit_menu_item():
-    menu_item = request.json['menuItem']
-    db = get_db_connection()
-    cursor = db.cursor()
-    # print(menu_item)
-    try:
-        cursor.execute("UPDATE menu_items SET name = %s, description = %s, calorie_count = %s, price = %s WHERE menu_item_id= %s", (menu_item['name'], menu_item['description'], menu_item['calories'],  menu_item['price'], menu_item['id']))
-        db.commit()
-        cursor.close()
-        db.close()
-        return jsonify({"message": "Menu Item Updated successfully"}), 200
-    except Exception as e:
-        cursor.close()
-        db.close()  
-        return jsonify({'message': str(e)}), 500
+# @dining_blueprint.route('/editMenuItem', methods=['PUT'])
+# def edit_menu_item():
+#     menu_item = request.json['menuItem']
+#     db = get_db_connection()
+#     cursor = db.cursor()
+#     # print(menu_item)
+#     try:
+#         cursor.execute("UPDATE menu_items SET name = %s, description = %s, calorie_count = %s, price = %s WHERE menu_item_id= %s", (menu_item['name'], menu_item['description'], menu_item['calories'],  menu_item['price'], menu_item['id']))
+#         db.commit()
+#         cursor.close()
+#         db.close()
+#         return jsonify({"message": "Menu Item Updated successfully"}), 200
+#     except Exception as e:
+#         cursor.close()
+#         db.close()  
+#         return jsonify({'message': str(e)}), 500
 
-@dining_blueprint.route('/deleteMenuItem/<int:menu_item_id>', methods=['DELETE'])
-def delete_menu_item(menu_item_id):
-    # print('MENU_ITEM_ID: ', menu_item_id)
-    db = get_db_connection()
-    cursor = db.cursor()
-    try:
-        cursor.execute("DELETE FROM menu_items WHERE menu_item_id = %s", (menu_item_id,))
-        db.commit()
-        cursor.close()
-        db.close()
-        return jsonify({"message": "Menu item deleted successfully"}), 200
-    except Exception as e:
-        cursor.close()
-        db.close()  
-        return jsonify({'message': str(e)}), 500
+# @dining_blueprint.route('/deleteMenuItem/<int:menu_item_id>', methods=['DELETE'])
+# def delete_menu_item(menu_item_id):
+#     # print('MENU_ITEM_ID: ', menu_item_id)
+#     db = get_db_connection()
+#     cursor = db.cursor()
+#     try:
+#         cursor.execute("DELETE FROM menu_items WHERE menu_item_id = %s", (menu_item_id,))
+#         db.commit()
+#         cursor.close()
+#         db.close()
+#         return jsonify({"message": "Menu item deleted successfully"}), 200
+#     except Exception as e:
+#         cursor.close()
+#         db.close()  
+#         return jsonify({'message': str(e)}), 500
 
-@dining_blueprint.route('/addMenuItem' , methods=['POST'])
-def add_menu_item():
-    menu_item = request.json['menuItem']
-    db = get_db_connection()
-    cursor = db.cursor()
-    # print(menu_item)
-    try:
-        cursor.execute('INSERT INTO menu_items (name, description, calorie_count, price, restaurant_id) VALUES (%s, %s, %s, %s, %s)', (menu_item['name'], menu_item['description'], menu_item['calories'], menu_item['price'], menu_item['restaurantId']))
-        db.commit()
-        cursor.close()
-        db.close()
-        return jsonify({"message": "Restaurant Added successfully"}), 200
-    except Exception as e:
-        cursor.close()
-        db.close()
-        return jsonify({'message': str(e)}), 500
+# @dining_blueprint.route('/addMenuItem' , methods=['POST'])
+# def add_menu_item():
+#     menu_item = request.json['menuItem']
+#     db = get_db_connection()
+#     cursor = db.cursor()
+#     # print(menu_item)
+#     try:
+#         cursor.execute('INSERT INTO menu_items (name, description, calorie_count, price, restaurant_id) VALUES (%s, %s, %s, %s, %s)', (menu_item['name'], menu_item['description'], menu_item['calories'], menu_item['price'], menu_item['restaurantId']))
+#         db.commit()
+#         cursor.close()
+#         db.close()
+#         return jsonify({"message": "Restaurant Added successfully"}), 200
+#     except Exception as e:
+#         cursor.close()
+#         db.close()
+#         return jsonify({'message': str(e)}), 500

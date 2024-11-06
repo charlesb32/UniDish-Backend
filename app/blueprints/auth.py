@@ -81,7 +81,9 @@ def login():
          # Close the cursor and connection
         cursor.close()
         db.close()
-        return jsonify({'message': 'Success', 'token': 'Bearer ' + token}), 200
+        # return jsonify({'message': 'Success', 'token': 'Bearer ' + token}), 200
+        return jsonify({'message': 'Success', 'token': 'Bearer ' + token.decode('utf-8')}), 200
+
      # Close the cursor and connection
     cursor.close()
     db.close()

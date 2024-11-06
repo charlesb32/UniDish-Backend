@@ -9,6 +9,7 @@ class Restaurant:
         self.menu_description = menu_description
         
     def to_dict(self):
+        """Convert the Restaurant object to a dictionary for JSON serialization."""
         return {
             'id': self.id,
             'name': self.name,

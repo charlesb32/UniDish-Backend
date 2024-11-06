@@ -8,6 +8,7 @@ class DiningHall:
         self.overall_rating = overall_rating
 
     def to_dict(self):
+        """Convert the DiningHall object to a dictionary for JSON serialization."""
         return {
             'id': self.id,
             'name': self.name,
