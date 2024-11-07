@@ -1,5 +1,6 @@
 from app.data_access.like_dao_interface import ILikeDAO
 from app.models.like import Like
+
 class LikeDAO(ILikeDAO):
     def __init__(self, db_connection):
         self.db = db_connection

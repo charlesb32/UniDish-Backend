@@ -33,6 +33,10 @@ from app.controllers.like_controller import LikeController
 from app.data_access.like_dao import LikeDAO
 from app.services.like_service import LikeService
 
+from app.controllers.dislike_controller import DislikeController
+from app.data_access.dislike_dao import DislikeDAO
+from app.services.dislike_service import DislikeService
+
 def setup_dao(db_connection):
     restaurant_dao = RestaurantDAO(db_connection)
     dining_hall_dao = DiningHallDAO(db_connection)
@@ -40,6 +44,7 @@ def setup_dao(db_connection):
     review_dao = ReviewDAO(db_connection)
     comment_dao = CommentDAO(db_connection)
     like_dao = LikeDAO(db_connection)
+    dislike_dao = DislikeDAO(db_connection)
     
     return{
         "restaurant_dao": restaurant_dao,
@@ -47,7 +52,8 @@ def setup_dao(db_connection):
         "menu_item_dao": menu_item_dao,
         'review_dao': review_dao,
         "comment_dao": comment_dao,
-        "like_dao": like_dao
+        "like_dao": like_dao,
+        "dislike_dao": dislike_dao
     }
 
 def setup_service(dao_map):
@@ -57,6 +63,7 @@ def setup_service(dao_map):
     review_service = ReviewService(dao_map['review_dao'])
     comment_service = CommentService(dao_map["comment_dao"])
     like_service = LikeService(dao_map["like_dao"])
+    dislike_service = DislikeService(dao_map["dislike_dao"])
     
     return {
         "restaurant_service" : restaurant_service,
@@ -64,7 +71,8 @@ def setup_service(dao_map):
         "menu_item_service": menu_item_service,
         "review_service": review_service,
         "comment_service": comment_service,
-        "like_service": like_service
+        "like_service": like_service,
+        "dislike_service": dislike_service
     }
 
 def create_app():
@@ -87,6 +95,7 @@ def create_app():
     review_controller = ReviewController(service_map['review_service'])
     comment_controller = CommentController(service_map["comment_service"])
     like_controller = LikeController(service_map["like_service"])
+    dislike_controller = DislikeController(service_map["dislike_service"])
     
     # Register routes by wrapping the instance methods
     app.add_url_rule('/api/restaurants/addRestaurant', 'add_restaurant', lambda: restaurant_controller.add_restaurant(), methods=['POST'])
@@ -109,6 +118,8 @@ def create_app():
     app.add_url_rule('/api/comments/addComment', 'add_comment', lambda: comment_controller.add_comment(), methods=['POST'])
     
     app.add_url_rule('/api/likes/like', 'like', lambda: like_controller.like(), methods=['POST'])
+    
+    app.add_url_rule('/api/dislikes/dislike', 'dislike', lambda: dislike_controller.dislike(), methods=['POST'])
     
     app.register_blueprint(auth_blueprint)
     # app.register_blueprint(dining_blueprint)
