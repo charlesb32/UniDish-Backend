@@ -7,7 +7,7 @@ class CommentService(ICommentService):
         self.comment_dao = comment_dao
 
     def add_comment(self, comment_data):
-        print('COMMETN DATA SERVICE: ', comment_data)
+        # print('COMMETN DATA SERVICE: ', comment_data)
         if not comment_data.get('userId'):
             raise ValueError("Comment user id is required")
         if not comment_data.get('reviewId'):
