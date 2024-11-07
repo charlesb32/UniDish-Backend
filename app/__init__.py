@@ -102,6 +102,7 @@ def create_app():
     app.add_url_rule('/api/restaurants/deleteRestaurant/<int:restaurant_id>', 'delete_restaurant', lambda restaurant_id: restaurant_controller.delete_restaurant(restaurant_id), methods=['DELETE'])
     app.add_url_rule('/api/restaurants/updateRestaurant', 'update_restaurant', lambda: restaurant_controller.edit_restaurant(), methods=['PUT'])
     app.add_url_rule('/api/restaurants/getRestaurant/<int:restaurant_id>', 'get_restaurant', lambda restaurant_id: restaurant_controller.get_restaurant(restaurant_id), methods=['GET'])
+    app.add_url_rule('/api/restaurants/getOverallRestaurantRating/<int:restaurant_id>', 'get_overall_restaurant_rating', lambda restaurant_id: restaurant_controller.get_overall_restaurant_rating(restaurant_id), methods=['GET'])
     
     app.add_url_rule('/api/diningHalls/addDiningHall', 'add_dining_hall', lambda: dining_hall_controller.add_dining_hall(), methods=['POST'])
     app.add_url_rule('/api/diningHalls/deleteDiningHall/<int:dining_hall_id>', 'delete_dining_hall', lambda dining_hall_id: dining_hall_controller.delete_dining_hall(dining_hall_id), methods=['DELETE'])

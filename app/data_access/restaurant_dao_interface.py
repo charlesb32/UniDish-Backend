@@ -17,3 +17,7 @@ class IRestaurantDAO(ABC):
     @abstractmethod
     def get_restaurant(self, restaurant_id: int):
         pass
+    
+    @abstractmethod
+    def get_average_rating(self, restaurant_id: int):
+        pass

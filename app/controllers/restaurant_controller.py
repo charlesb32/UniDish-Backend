@@ -48,3 +48,13 @@ class RestaurantController:
             return jsonify({"error": str(ve)}), 400
         except Exception as e:
             return jsonify({"error": str(e)}), 500
+    
+    @restaurant_blueprint.route('/getOverallRestaurantRating/<int:restaurant_id>', methods=['GET'])
+    def get_overall_restaurant_rating(self, restaurant_id):
+        try:
+            average_rating = self.restaurant_service.get_average_rating(restaurant_id)
+            return jsonify({'averageRating': average_rating}), 200
+        except ValueError as ve:
+            return jsonify({"error": str(ve)}), 400
+        except Exception as e:
+            return jsonify({'message': str(e)}), 500

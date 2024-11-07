@@ -54,3 +54,16 @@ class RestaurantDAO(IRestaurantDAO):
             raise e
         finally:
             cursor.close()
+    
+    def get_average_rating(self, restaurant_id: int):
+        cursor = self.db.cursor(dictionary=True)
+        try:
+            query = "SELECT AVG(rating) AS average_rating FROM reviews WHERE restaurant_id = %s"
+            cursor.execute(query, (restaurant_id,))
+            result = cursor.fetchone()
+            return result['average_rating'] if result['average_rating'] else 0
+        except Exception as e:
+            self.db.rollback()
+            raise e
+        finally:
+            cursor.close()

@@ -50,3 +50,13 @@ class RestaurantService(IRestaurantService):
             raise ValueError(f"Restaurant with ID {restaurant_id} not found")
         
         return restaurant
+    
+    def get_average_rating(self, restaurant_id: int):
+        if not restaurant_id:
+            raise ValueError("Restaurant ID is required")
+
+        average_rating = self.restaurant_dao.get_average_rating(restaurant_id)
+        if average_rating is None:
+            raise ValueError(f"Restaurant with ID {restaurant_id} not found")
+
+        return average_rating
