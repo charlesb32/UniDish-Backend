@@ -5,3 +5,7 @@ class IReviewDAO(ABC):
     @abstractmethod
     def add_review(self, review: Review):
         pass
+    
+    # @abstractmethod
+    # def get_reviews(self, user_id, restaurant_id: int):
+    #     pass

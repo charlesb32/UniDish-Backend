@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
-from ..models.review import Review
+from ..models.comment import Comment
 
-class IReviewService(ABC):
+class ICommentService(ABC):
     @abstractmethod
-    def add_review(self, review: Review):
+    def add_comment(self, comment: Comment):
         pass
     
     # @abstractmethod

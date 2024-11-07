@@ -16,3 +16,8 @@ class ReviewDAO(IReviewDAO):
             raise e
         finally:
             cursor.close()
+    
+    # def get_reviews(self, restaurant_id: int):
+    #     cursor = self.db.cursor()
+    #     try:
+            

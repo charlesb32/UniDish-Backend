@@ -7,7 +7,7 @@ class ReviewService(IReviewService):
         self.review_dao = review_dao
 
     def add_review(self, review_data):
-        print(review_data)
+        # print(review_data)
         if not review_data.get('restaurantId'):
             raise ValueError("Review restaurant id is required")
         if not review_data.get('userId'):
@@ -22,3 +22,8 @@ class ReviewService(IReviewService):
         )
 
         self.review_dao.add_review(review)
+    
+    def get_reviews(self, restaurant_id: int):
+        if not restaurant_id:
+            raise ValueError('Reviews restaurant id is required')
+        

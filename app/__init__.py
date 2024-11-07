@@ -25,17 +25,23 @@ from app.controllers.review_controller import ReviewController
 from app.data_access.review_dao import ReviewDAO
 from app.services.review_service import ReviewService
 
+from app.controllers.comment_controller import CommentController
+from app.data_access.comment_dao import CommentDAO
+from app.services.comment_service import CommentService
+
 def setup_dao(db_connection):
     restaurant_dao = RestaurantDAO(db_connection)
     dining_hall_dao = DiningHallDAO(db_connection)
     menu_item_dao = MenuItemDAO(db_connection)
     review_dao = ReviewDAO(db_connection)
+    comment_dao = CommentDAO(db_connection)
     
     return{
         "restaurant_dao": restaurant_dao,
         "dining_hall_dao": dining_hall_dao,
         "menu_item_dao": menu_item_dao,
-        'review_dao': review_dao
+        'review_dao': review_dao,
+        "comment_dao": comment_dao
     }
 
 def setup_service(dao_map):
@@ -43,12 +49,14 @@ def setup_service(dao_map):
     dining_hall_service = DiningHallService(dao_map["dining_hall_dao"])
     menu_item_service = MenuItemService(dao_map['menu_item_dao'])
     review_service = ReviewService(dao_map['review_dao'])
+    comment_service = CommentService(dao_map["comment_dao"])
     
     return {
         "restaurant_service" : restaurant_service,
         "dining_hall_service" : dining_hall_service,
         "menu_item_service": menu_item_service,
-        "review_service": review_service
+        "review_service": review_service,
+        "comment_service": comment_service
     }
 
 def create_app():
@@ -69,6 +77,7 @@ def create_app():
     dining_hall_controller = DiningHallController(service_map["dining_hall_service"])
     menu_item_controller = MenuItemController(service_map['menu_item_service'])
     review_controller = ReviewController(service_map['review_service'])
+    comment_controller = CommentController(service_map["comment_service"])
     
     # Register routes by wrapping the instance methods
     app.add_url_rule('/api/restaurants/addRestaurant', 'add_restaurant', lambda: restaurant_controller.add_restaurant(), methods=['POST'])
@@ -87,6 +96,8 @@ def create_app():
     app.add_url_rule('/api/menuItems/getMenuItemsForRestaurant/<int:restaurant_id>', 'get_menu_items_for_restaurant', lambda restaurant_id: menu_item_controller.get_menu_items_for_restaurant(restaurant_id), methods=['GET'])
 
     app.add_url_rule('/api/reviews/addReview', 'add_review', lambda: review_controller.add_review(), methods=['POST'])
+    
+    app.add_url_rule('/api/comments/addComment', 'add_comment', lambda: comment_controller.add_comment(), methods=['POST'])
     
     app.register_blueprint(auth_blueprint)
     # app.register_blueprint(dining_blueprint)

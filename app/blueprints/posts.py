@@ -249,52 +249,52 @@ def get_overall_restaurant_rating():
         cursor.close()
         db.close()
 
-@posts_blueprint.route('/createReview', methods=['POST'])
-def create_review():
-    db = get_db_connection()
-    cursor = db.cursor(dictionary=True)
-    review_info = request.json['reviewInfo']
-    rating = review_info['rating']
-    description = review_info['description']
-    user_id = review_info['userId']
-    rest_id = review_info['restaurantId']
-    date = review_info['date']
-    try:
-        cursor.execute("""
-        INSERT INTO reviews (date, rating, description, restaurant_id, user_id)
-        VALUES (%s, %s, %s, %s, %s)
-        """, (date, rating, description, rest_id, user_id))
-        db.commit()
-        return jsonify({'message': 'Review added successfully'}), 200
-    except Exception as e:
-        # print(f"Error in create_review: {e}")
-        return jsonify({'message': str(e)}), 500
-    finally:
-        cursor.close()
-        db.close()
+# @posts_blueprint.route('/createReview', methods=['POST'])
+# def create_review():
+#     db = get_db_connection()
+#     cursor = db.cursor(dictionary=True)
+#     review_info = request.json['reviewInfo']
+#     rating = review_info['rating']
+#     description = review_info['description']
+#     user_id = review_info['userId']
+#     rest_id = review_info['restaurantId']
+#     date = review_info['date']
+#     try:
+#         cursor.execute("""
+#         INSERT INTO reviews (date, rating, description, restaurant_id, user_id)
+#         VALUES (%s, %s, %s, %s, %s)
+#         """, (date, rating, description, rest_id, user_id))
+#         db.commit()
+#         return jsonify({'message': 'Review added successfully'}), 200
+#     except Exception as e:
+#         # print(f"Error in create_review: {e}")
+#         return jsonify({'message': str(e)}), 500
+#     finally:
+#         cursor.close()
+#         db.close()
 
-@posts_blueprint.route('/createComment', methods=['POST'])
-def create_comment():
-    db = get_db_connection()
-    cursor = db.cursor(dictionary=True)
-    comment_info = request.json['commentInfo']
-    description = comment_info['description']
-    user_id = comment_info['userId']
-    date = comment_info['date']
-    review_id = comment_info['reviewId']
-    try:
-        cursor.execute("""
-        INSERT INTO comments (description, user_id, review_id, date)
-        VALUES (%s, %s, %s, %s)
-        """, (description, user_id, review_id, date))
-        db.commit()
-        return jsonify({'message': 'Comment added successfully'}), 200
-    except Exception as e:
-        # print(f"Error in create_comment: {e}")
-        return jsonify({'message': str(e)}), 500
-    finally:
-        cursor.close()
-        db.close()
+# @posts_blueprint.route('/createComment', methods=['POST'])
+# def create_comment():
+#     db = get_db_connection()
+#     cursor = db.cursor(dictionary=True)
+#     comment_info = request.json['commentInfo']
+#     description = comment_info['description']
+#     user_id = comment_info['userId']
+#     date = comment_info['date']
+#     review_id = comment_info['reviewId']
+#     try:
+#         cursor.execute("""
+#         INSERT INTO comments (description, user_id, review_id, date)
+#         VALUES (%s, %s, %s, %s)
+#         """, (description, user_id, review_id, date))
+#         db.commit()
+#         return jsonify({'message': 'Comment added successfully'}), 200
+#     except Exception as e:
+#         # print(f"Error in create_comment: {e}")
+#         return jsonify({'message': str(e)}), 500
+#     finally:
+#         cursor.close()
+#         db.close()
 
 @posts_blueprint.route('/getComments', methods=['GET'])
 def get_review_comments():
