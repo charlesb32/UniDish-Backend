@@ -10,7 +10,7 @@ import mysql.connector
 db_config = {
     "host": "192.168.1.25",  # replace with the server's IP address
     "user": "charlesb32",
-    "password": "Capsfan26!",
+    "password": "******",
     "database": "unidishdb",
     "port": 3306
 }
